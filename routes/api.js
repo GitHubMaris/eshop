@@ -8,7 +8,7 @@ router.post('/reservations', async (req, res) => {
 
   try {
     const productResult = await db.query(
-      'SELECT * FROM products WHERE id = $1',
+      'SELECT * FROM eshop_products WHERE id = $1',
       [productId]
     );
 
@@ -35,8 +35,12 @@ router.post('/reservations', async (req, res) => {
     }
 
     const newStock = product.stock - quantity;
+    const newReservedCount = (product.reserved_count || 0) + quantity;
 
-    await db.query('UPDATE products SET stock = $1 WHERE id = $2', [newStock, productId]);
+    await db.query(
+      'UPDATE eshop_products SET stock = $1, reserved_count = $2 WHERE id = $3',
+      [newStock, newReservedCount, productId]
+    );
 
     await db.query(
       'INSERT INTO reservations (product_id, quantity, status) VALUES ($1, $2, $3)',
