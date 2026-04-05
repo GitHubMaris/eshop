@@ -1,0 +1,18 @@
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  warehouse_id INT NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  price NUMERIC(10,2) NOT NULL,
+  stock INT NOT NULL DEFAULT 0,
+  reserved_count INT NOT NULL DEFAULT 0,
+  last_synced_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE reservations (
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  quantity INT NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

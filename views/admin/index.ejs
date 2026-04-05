@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin panelis</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="admin-page">
+    <div class="admin-header">
+      <h1 class="admin-title">Internetveikala admin panelis</h1>
+      <a href="/" class="back-link">Atvērt veikalu</a>
+    </div>
+
+    <div class="action-bar">
+      <form action="/admin/products/clear" method="POST" class="action-form">
+        <button type="submit" class="action-button danger">Dzēst visus produktus</button>
+      </form>
+
+      <form action="/admin/products/sync" method="POST" class="action-form">
+        <button type="submit" class="action-button primary">Iegūt visus produktus no noliktavas</button>
+      </form>
+    </div>
+
+    <div class="admin-card" style="margin-bottom: 24px;">
+      <h2 class="admin-card-title">Produkti internetveikala datubāzē</h2>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <tr>
+            <th>Veikala ID</th>
+            <th>Noliktavas ID</th>
+            <th>Nosaukums</th>
+            <th>Apraksts</th>
+            <th>Cena</th>
+            <th>Atlikums</th>
+            <th>Rezervēts</th>
+            <th>Pēdējā sinhronizācija</th>
+            <th>Darbības</th>
+          </tr>
+
+          <% products.forEach(product => { %>
+            <tr>
+              <td><%= product.id %></td>
+              <td><span class="muted-text"><%= product.warehouse_id %></span></td>
+              <td><strong><%= product.name %></strong></td>
+              <td><%= product.description %></td>
+              <td><%= Number(product.price).toFixed(2) %> EUR</td>
+              <td><span class="badge stock"><%= product.stock %></span></td>
+              <td><span class="badge reserved"><%= product.reserved_count || 0 %></span></td>
+              <td class="muted-text"><%= product.last_synced_at %></td>
+              <td>
+                <form action="/admin/products/<%= product.warehouse_id %>/sync-stock" method="POST" class="table-action-form">
+                  <button type="submit" class="table-action-button">Atjaunot atlikumu</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-card">
+    <div class="admin-header" style="margin-bottom: 16px;">
+        <h2 class="admin-card-title" style="margin-bottom: 0;">Rezervācijas</h2>
+
+            <form action="/admin/reservations/cleanup" method="POST" class="action-form">
+            <button type="submit" class="action-button">Atjaunot sarakstu</button>
+            </form>
+        </div>
+
+      <div class="table-wrapper">
+        <table class="data-table">
+          <tr>
+            <th>Rezervācijas ID</th>
+            <th>Produkta ID</th>
+            <th>Produkts</th>
+            <th>Daudzums</th>
+            <th>Statuss</th>
+            <th>Datums</th>
+            <th>Darbības</th>
+          </tr>
+
+          <% reservations.forEach(reservation => { %>
+            <tr>
+              <td><%= reservation.id %></td>
+              <td><%= reservation.product_id %></td>
+              <td><strong><%= reservation.product_name %></strong></td>
+              <td><%= reservation.quantity %></td>
+              <td>
+                <% if (reservation.status === 'RESERVED') { %>
+                  <span class="badge stock"><%= reservation.status %></span>
+                <% } else { %>
+                  <span class="badge reserved"><%= reservation.status %></span>
+                <% } %>
+              </td>
+              <td class="muted-text"><%= reservation.created_at %></td>
+              <td>
+                <% if (reservation.status === 'RESERVED') { %>
+                  <form action="/admin/reservations/<%= reservation.id %>/cancel" method="POST" class="table-action-form">
+                    <button type="submit" class="table-action-button">Atcelt rezervāciju</button>
+                  </form>
+                <% } else { %>
+                  <span class="muted-text">Atcelta</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

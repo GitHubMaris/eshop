@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internetveikals</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="site-header">
+      <h1 class="site-title">Internetveikals</h1>
+      <a href="/admin" class="admin-link">Admin panelis</a>
+    </header>
+
+    <% if (success) { %>
+      <div class="message success"><%= success %></div>
+    <% } %>
+
+    <% if (error) { %>
+      <div class="message error"><%= error %></div>
+    <% } %>
+
+    <% if (products.length === 0) { %>
+      <p class="empty-message">Šobrīd nav pieejamu produktu.</p>
+    <% } else { %>
+      <div class="products-grid">
+        <% products.forEach(product => { %>
+          <div class="product-card">
+            <div class="product-image-placeholder"></div>
+
+            <h2 class="product-name"><%= product.name %></h2>
+
+            <p class="product-description"><%= product.description %></p>
+
+            <div class="product-price">
+              <%= Number(product.price).toFixed(2) %> EUR
+            </div>
+
+            <div class="product-meta">
+              <div class="stock-label">Pieejamais atlikums</div>
+              <div class="stock-count"><%= product.stock %></div>
+            </div>
+
+            <form action="/reserve/<%= product.id %>" method="POST" class="reserve-form">
+              <input type="number" name="quantity" min="1" value="1" required>
+              <button type="submit" class="reserve-button">Rezervēt</button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
