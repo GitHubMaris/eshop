@@ -8,7 +8,7 @@ const db = require('../db');
 router.get('/', async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT * FROM products WHERE stock > 0 ORDER BY id ASC'
+      'SELECT * FROM eshop_products WHERE stock > 0 ORDER BY id ASC'
     );
 
     res.render('shop/index', {
@@ -31,7 +31,7 @@ router.post('/reserve/:id', async (req, res) => {
   try {
     // Atrod produktu internetveikala datubāzē
     const productResult = await db.query(
-      'SELECT * FROM products WHERE id = $1',
+      'SELECT * FROM eshop_products WHERE id = $1',
       [productId]
     );
 
@@ -62,7 +62,7 @@ router.post('/reserve/:id', async (req, res) => {
 
     // Atjauno produkta atlikumu internetveikala datubāzē
     await db.query(
-      'UPDATE products SET stock = $1, reserved_count = $2 WHERE id = $3',
+      'UPDATE eshop_products SET stock = $1, reserved_count = $2 WHERE id = $3',
       [newStock, newReservedCount, productId]
     );
 

@@ -7,7 +7,7 @@ const db = require('../db');
 router.get('/', async (req, res) => {
   try {
     const productsResult = await db.query(
-      'SELECT * FROM products ORDER BY id ASC'
+      'SELECT * FROM eshop_products ORDER BY id ASC'
     );
 
     const reservationsResult = await db.query(`
@@ -17,9 +17,9 @@ router.get('/', async (req, res) => {
         reservations.quantity,
         reservations.status,
         reservations.created_at,
-        products.name AS product_name
+        eshop_products.name AS product_name
       FROM reservations
-      JOIN products ON products.id = reservations.product_id
+      JOIN eshop_products ON eshop_products.id = reservations.product_id
       ORDER BY reservations.id DESC
     `);
 
@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
 router.post('/products/clear', async (req, res) => {
   try {
     await db.query('DELETE FROM reservations');
-    await db.query('DELETE FROM products');
+    await db.query('DELETE FROM eshop_products');
     res.redirect('/admin');
   } catch (err) {
     res.status(500).send(err.message);
@@ -55,14 +55,14 @@ router.post('/products/sync', async (req, res) => {
 
     for (const product of warehouseProducts) {
       const existingProduct = await db.query(
-        'SELECT id FROM products WHERE warehouse_id = $1',
+        'SELECT id FROM eshop_products WHERE warehouse_id = $1',
         [product.id]
       );
 
       // Ja produkts internetveikala DB vēl neeksistē, veic INSERT
       if (existingProduct.rows.length === 0) {
         await db.query(
-          `INSERT INTO products (
+          `INSERT INTO eshop_products (
             warehouse_id,
             name,
             description,
@@ -84,7 +84,7 @@ router.post('/products/sync', async (req, res) => {
       } else {
         // Ja produkts internetveikala DB jau eksistē, veic UPDATE
         await db.query(
-          `UPDATE products
+          `UPDATE eshop_products
            SET name = $1,
                description = $2,
                price = $3,
@@ -121,7 +121,7 @@ router.post('/products/:warehouseId/sync-stock', async (req, res) => {
     const stockData = await response.json();
 
     await db.query(
-      `UPDATE products
+      `UPDATE eshop_products
        SET stock = $1,
            last_synced_at = CURRENT_TIMESTAMP
        WHERE warehouse_id = $2`,
@@ -157,7 +157,7 @@ router.post('/reservations/:id/cancel', async (req, res) => {
     }
 
     const productResult = await db.query(
-      'SELECT * FROM products WHERE id = $1',
+      'SELECT * FROM eshop_products WHERE id = $1',
       [reservation.product_id]
     );
 
@@ -173,7 +173,7 @@ router.post('/reservations/:id/cancel', async (req, res) => {
     );
 
     await db.query(
-      'UPDATE products SET stock = $1, reserved_count = $2 WHERE id = $3',
+      'UPDATE eshop_products SET stock = $1, reserved_count = $2 WHERE id = $3',
       [newStock, newReservedCount, product.id]
     );
 

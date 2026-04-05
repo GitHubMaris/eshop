@@ -1,4 +1,4 @@
-CREATE TABLE products (
+CREATE TABLE eshop_products (
   id SERIAL PRIMARY KEY,
   warehouse_id INT NOT NULL UNIQUE,
   name VARCHAR(255) NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE products (
 
 CREATE TABLE reservations (
   id SERIAL PRIMARY KEY,
-  product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  product_id INT NOT NULL REFERENCES eshop_products(id) ON DELETE CASCADE,
   quantity INT NOT NULL,
   status VARCHAR(50) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
